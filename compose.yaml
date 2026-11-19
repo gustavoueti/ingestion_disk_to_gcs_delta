@@ -1,0 +1,26 @@
+# The container where Spark runs the job. The job runs with
+# `docker compose exec job uv run --locked python src/main.py`.
+#
+# `.env` holds paths only, never a key: GOOGLE_ADC_FILE, and IMDB_DATA_DIR when the IMDb files
+# are not in ./data. Both mounts are read-only, and a host path that does not exist fails
+# `docker compose up` instead of being created as an empty directory.
+services:
+  job:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/adc.json
+    volumes:
+      - type: bind
+        source: ${IMDB_DATA_DIR:-./data}
+        target: /data
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${GOOGLE_ADC_FILE:?GOOGLE_ADC_FILE must name the credential file on the host, set it in .env}
+        target: /run/secrets/adc.json
+        read_only: true
+        bind:
+          create_host_path: false

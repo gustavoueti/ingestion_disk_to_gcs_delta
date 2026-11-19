@@ -1,0 +1,29 @@
+# The build context admits only what the image needs. No credential and no IMDb file can reach
+# it, and so neither can reach the image.
+*
+!pyproject.toml
+!uv.lock
+!.python-version
+!src/
+
+# Excluded again, wherever they appear, including inside src/.
+**/.dotenv
+**/.env
+**/.env*
+**/application_default_credentials.json
+**/*credentials*.json
+**/*service-account*.json
+**/*service_account*.json
+**/*-key.json
+**/*_key.json
+**/key.json
+**/keyfile.json
+**/*.p12
+**/*.pem
+**/.gcloud/
+**/gcloud/
+**/secrets/
+**/*.tsv
+**/*.tsv.gz
+**/data/
+**/__pycache__/

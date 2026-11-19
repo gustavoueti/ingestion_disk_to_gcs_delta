@@ -35,19 +35,26 @@ no test.
 
 ### Layout
 
-- The job's code lives in `src/`: `main.py`, `config.json` and every other file of the job's
-  structure. None of it sits at the root of the repository.
+- The job's code lives in `src/`: `main.py`, one configuration file per table,
+  `config_<table>.json`, and every other file of the job's structure.
+- What runs that code sits at the root, by the maintainer's decision: the `Dockerfile`,
+  `.dockerignore` and `compose.yaml` of the container where Spark runs, and `scripts/`, with
+  the script that downloads the IMDb files on the host. No other code of the job sits at the
+  root of the repository.
 - `src/main.py` is the entry point: it defines the job's own callbacks, places them and the
   shipped ones in steps, and runs the process. The job's callbacks are written in `main.py`
   itself, never in a module of their own such as `callbacks.py`.
-- `src/config.json` holds the job's configuration: its source, its target and its parameters,
-  as the knowledge base describes. Credentials never go in it.
+- Each `src/config_<table>.json` holds the configuration of one table: its source, its target
+  and its parameters, as the knowledge base describes. A configuration file holds one source
+  and one target, so the job has one file per table, and `main.py` lists them in load order.
+  Credentials never go in them.
 - The job's helpers, when it needs any, live in modules next to `main.py`, in `src/`, named
   after what they do, such as `schema.py`. They hold no callback.
 - `main.py` runs the process only under `if __name__ == "__main__":`, so tests import its
   pieces without running it. pytest puts `src/` on the path, so tests import the job's
   modules by name: `import main`.
-- The job runs with `uv run python src/main.py`.
+- The job runs inside its container, with `docker compose exec job uv run --locked python
+  src/main.py`; `README.md` shows the whole sequence.
 
 ### Style
 
