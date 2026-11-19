@@ -1,6 +1,6 @@
 # Ingest the IMDb datasets into Delta Lake tables on GCS
 
-Spec: [ingest_imdb_datasets](../specs/ingest_imdb_datasets.md). Job version: `0.2.0`.
+Spec: [ingest_imdb_datasets](../specs/ingest_imdb_datasets.md). Job version: `0.2.1`.
 
 The job loads two files of the IMDb non-commercial datasets, `title.basics.tsv.gz` and
 `title.ratings.tsv.gz`, into two Delta Lake tables of a Google Cloud Storage bucket. A script
@@ -43,7 +43,7 @@ archive of pyspark, which is large.
 ## How to run it
 
 ```bash
-uv run python scripts/download_imdb.py data      # on the host: the two IMDb files
+uv run --locked python scripts/download_imdb.py data   # on the host: the two IMDb files
 docker compose up -d --build                     # build the image, start the container
 docker compose exec job uv run --locked python src/main.py
 docker compose down                              # when done
@@ -59,7 +59,7 @@ time against the same tables: two runs at once are not supported.
 `scripts/download_imdb.py` runs on the host and uses the standard library only:
 
 ```bash
-uv run python scripts/download_imdb.py <directory> [--base-url <url>]
+uv run --locked python scripts/download_imdb.py <directory> [--base-url <url>]
 ```
 
 - It downloads `title.basics.tsv.gz` and then `title.ratings.tsv.gz` from `<url>`, which is
@@ -355,7 +355,24 @@ checks:
 
 1. The bucket `ingestio-imdb-delta` exists and is not publicly readable. Create it before the
    run. Nothing exists under its `imdb/` prefix yet: a Delta table there with another schema makes
-   the first overwrite fail.
+   the first overwrite fail. The bucket, the service account, its two roles and its key are
+   created once with `gcloud`, replacing the placeholders:
+
+   ```bash
+   gcloud config set project <PROJECT_ID>
+   gcloud storage buckets create gs://ingestio-imdb-delta --location=<LOCATION> \
+     --uniform-bucket-level-access --public-access-prevention
+   gcloud iam service-accounts create <SA_NAME>
+   SA=<SA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
+   gcloud storage buckets add-iam-policy-binding gs://ingestio-imdb-delta \
+     --member="serviceAccount:$SA" --role=roles/storage.objectUser
+   gcloud storage buckets add-iam-policy-binding gs://ingestio-imdb-delta \
+     --member="serviceAccount:$SA" --role=roles/storage.legacyBucketReader
+   gcloud iam service-accounts keys create <path outside the repository>/<SA_NAME>.json \
+     --iam-account="$SA"
+   ```
+
+   An organization policy may forbid creating the key (`iam.disableServiceAccountKeyCreation`).
 2. The service account holds `roles/storage.objectUser` and `roles/storage.legacyBucketReader`,
    bound on the bucket only, not on the project. Together they hold the minimum a Delta write on
    this prefix needs:
