@@ -6,6 +6,15 @@ created by the maintainer.
 
 <!-- version list -->
 
+## v0.2.1 — 2026-11-19 (unreleased)
+
+- The README orders the prerequisites before the setup, adds Java to them, and gives the GCP
+  setup commands (bucket, service account, roles, key, `.env`). The same commands are in
+  [docs/ingest_imdb_datasets.md](docs/ingest_imdb_datasets.md).
+- The README says what a successful run looks like and how to check it in the bucket, and gives
+  the test command that needs neither Java nor the network. The download command uses
+  `--locked` like the others.
+
 ## v0.2.0 — 2026-11-19 (unreleased)
 
 - Ingests the IMDb datasets `title.basics.tsv.gz` and `title.ratings.tsv.gz` into two Delta
