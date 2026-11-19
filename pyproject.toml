@@ -1,0 +1,66 @@
+[project]
+name = "ingestion_disk_to_gcs_delta"
+version = "0.1.0"
+description = "Loads the gzip-compressed TSV files of the IMDb non-commercial datasets from a directory on disk, inside a Spark container, into Delta Lake tables in a Google Cloud Storage bucket."
+readme = "README.md"
+requires-python = ">=3.12"
+# ingestio alone, pinned to the version of .claude/kb/ingestio.md, from PyPI or from a tag of
+# its GitHub repository, never from a local path.
+dependencies = ["ingestio==0.7.0"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.9",
+    "mypy>=1.13",
+    "pre-commit>=4.0",
+]
+
+# ---------------------------------------------------------------------------
+# ruff — lint + format
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort
+    "N",        # pep8-naming
+    "UP",       # pyupgrade
+    "B",        # flake8-bugbear
+    "A",        # flake8-builtins
+    "C4",       # flake8-comprehensions
+    "DTZ",      # flake8-datetimez  — enforces timezone-aware timestamps
+    "SIM",      # flake8-simplify
+    "PTH",      # flake8-use-pathlib
+    "RUF",      # ruff's own rules
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+# The job is not a package: its modules are imported from src/, where its code lives.
+pythonpath = ["src"]
+addopts = "-ra --strict-markers --strict-config"
+markers = [
+    "integration: tests that touch an external resource (network, Docker, Spark)",
+]
+
+# ---------------------------------------------------------------------------
+# mypy
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+# Hidden directories, .venv and .claude among them, are skipped.
+files = ["."]
+strict = true

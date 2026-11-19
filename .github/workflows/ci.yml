@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    # A job whose tests need more than Python, such as Java for Spark or a database in a service
+    # container, adds it here. The four checks below stay as they are.
+    #
+    # This job's connectors, DiskReader and GcsWriter, run on Spark. CI has no Google Cloud
+    # credentials, and none is ever added: no test reaches a real bucket.
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+          python-version-file: .python-version
+
+      # Java for Spark: Spark 4 runs on Java 17 or 21. The packages the tests' Spark session
+      # loads, such as Delta Lake, come from Maven Central when it starts.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # --locked fails when uv.lock is out of date, instead of silently resolving
+      # something different from what a developer has locally.
+      - run: uv sync --locked
+
+      - run: uv run --locked ruff check .
+      - run: uv run --locked ruff format --check .
+      # Until its first spec is tested, the job holds no Python file of its own: mypy refuses to
+      # run without one, and pytest exits with 5 when it collects no test. Any other failure
+      # fails the build.
+      - run: |
+          if [ -n "$(git ls-files '*.py' ':!:.claude/')" ]; then uv run --locked mypy; fi
+      - run: uv run --locked pytest -q || test $? -eq 5
+
+  pr-title:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      # Merges are squashed, so the PR title becomes the commit message on main.
+      - uses: amannn/action-semantic-pull-request@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            perf
+            refactor
+            docs
+            test
+            build
+            ci
+            chore
+            revert

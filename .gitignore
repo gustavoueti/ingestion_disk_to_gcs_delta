@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Environments
+.venv/
+venv/
+.env
+.env.*
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# uv.lock is deliberately NOT ignored: it is committed for reproducible builds.
+
+# Spark and Delta, when a job runs them locally
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Claude Code runtime artifacts. .claude/agents/, .claude/hooks/, .claude/kb/ and
+# .claude/settings.json are versioned.
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Credentials never enter the repository: the job authenticates only through Application
+# Default Credentials that its environment provides when it runs, as AGENTS.md records. These
+# are the usual names of the files that hold them, and of the directories they are kept in.
+application_default_credentials.json
+*credentials*.json
+*service-account*.json
+*service_account*.json
+*-key.json
+*_key.json
+key.json
+keyfile.json
+*.p12
+*.pem
+.gcloud/
+gcloud/
+secrets/
+
+# The IMDb datasets are licensed for personal and non-commercial use only: the job downloads
+# them where it runs and never commits them, wherever they land.
+*.tsv
+*.tsv.gz
