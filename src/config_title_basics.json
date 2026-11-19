@@ -1,0 +1,29 @@
+{
+  "source": {
+    "system": "disk",
+    "path": "/data/title.basics",
+    "format": "csv",
+    "schema": "tconst STRING, titleType STRING, primaryTitle STRING, originalTitle STRING, isAdult INT, startYear INT, endYear INT, runtimeMinutes INT, genres STRING",
+    "options": {
+      "sep": "\t",
+      "header": true,
+      "nullValue": "\\N",
+      "quote": "",
+      "mode": "FAILFAST",
+      "enforceSchema": false
+    }
+  },
+  "target": {
+    "system": "gcs",
+    "path": "gs://ingestio-imdb-delta/imdb/title_basics",
+    "format": "delta"
+  },
+  "convert": {
+    "booleans": [
+      "isAdult"
+    ],
+    "lists": [
+      "genres"
+    ]
+  }
+}

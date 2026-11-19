@@ -10,6 +10,7 @@ dist/
 venv/
 .env
 .env.*
+.dotenv
 
 # Tooling caches
 .pytest_cache/
@@ -63,3 +64,6 @@ secrets/
 # them where it runs and never commits them, wherever they land.
 *.tsv
 *.tsv.gz
+
+# Where the download script puts the IMDb files by default (the data of the job).
+data/

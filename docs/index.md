@@ -21,8 +21,7 @@ Pages that document the job's processes, written by the documenter.
 
 | Page | Covers |
 |---|---|
-
-_No page yet._
+| [ingest_imdb_datasets.md](ingest_imdb_datasets.md) | The process that loads `title.basics` and `title.ratings` into Delta Lake tables on GCS: download, container, authentication, configuration, Spark session, output, log, errors, first run against the bucket, tests. |
 
 ## Specs
 
@@ -30,8 +29,7 @@ One spec per change, in [`specs/`](../specs/), written from [the template](../sp
 
 | Spec | Covers | Status |
 |---|---|---|
-
-_No spec yet._
+| [ingest_imdb_datasets](../specs/ingest_imdb_datasets.md) | Loads `title.basics` and `title.ratings` of the IMDb datasets into Delta Lake tables in a GCS bucket (version 0.2.0). | validated |
 
 ## Agent tooling
 

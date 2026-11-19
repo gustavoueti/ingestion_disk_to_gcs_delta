@@ -1,0 +1,21 @@
+{
+  "source": {
+    "system": "disk",
+    "path": "/data/title.ratings",
+    "format": "csv",
+    "schema": "tconst STRING, averageRating DOUBLE, numVotes INT",
+    "options": {
+      "sep": "\t",
+      "header": true,
+      "nullValue": "\\N",
+      "quote": "",
+      "mode": "FAILFAST",
+      "enforceSchema": false
+    }
+  },
+  "target": {
+    "system": "gcs",
+    "path": "gs://ingestio-imdb-delta/imdb/title_ratings",
+    "format": "delta"
+  }
+}
